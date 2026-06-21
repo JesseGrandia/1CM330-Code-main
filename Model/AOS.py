@@ -3,7 +3,7 @@ import random
 
 class AOS:
     def __init__(self, operators, segment_size=100, reaction_factor=0.1):
-        self.operators = operators  # Dictionary of {"name": function}
+        self.operators = operators 
         self.segment_size = segment_size
         self.reaction_factor = reaction_factor
         

@@ -155,7 +155,7 @@ def alns(
     ALNS for the MoP-VRP with two selectable modes:
 
       mode="qlearning" : Hybrid. A single Q-learning agent selects a full
-                         COMBINATION of (destroy, repair, noise) as one action,
+                         combination of (destroy, repair, noise) as one action,
                          and acceptance is governed by Simulated Annealing.
 
       mode="base"      : Pure metaheuristic from Wang et al. (2023). Three
@@ -180,7 +180,6 @@ def alns(
     if current_solution.feasible:
         best_solution = deepcopy(current_solution)
 
-    # Noise magnitude (shared)
     eta_dist = 0.025
     max_distance = max(max(row) for row in instance.distance_matrix)
     max_N = eta_dist * max_distance

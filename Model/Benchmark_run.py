@@ -1,9 +1,6 @@
 """
-Benchmark_run.py  (Run-by-Run version for Statistical Analysis)
-
-This script outputs the data for EVERY SINGLE RUN (10 runs per instance) 
-rather than just the average. This is strictly required to perform the 
-Wilcoxon signed-rank test for your assignment.
+This script outputs the data for every run (10 runs per instance). 
+This is used to perform the Wilcoxon signed-rank test.
 """
 
 import csv
@@ -17,16 +14,16 @@ from Greedy_insertion import greedy_insertion
 
 
 # ---- SETTINGS ----------------------------------------------------------
-# ONE SWITCH controls everything: set MODE to "qlearning" or "base".
+#   set MODE to "qlearning" or "base".
 #   "qlearning" -> Q-learning combination agent + Simulated Annealing (hybrid)
 #   "base"      -> AOS roulette wheel + threshold acceptance (pure metaheuristic)
 MODE = "qlearning"
 
-MODEL_NAME = MODE                         # label written into the CSV / printed
-OUTPUT_FILE = f"{MODE}_results.csv"       # e.g. "qlearning_results.csv" / "base_results.csv"
+MODEL_NAME = MODE                         
+OUTPUT_FILE = f"{MODE}_results.csv"    
 
-N_RUNS = 10                        # 10 independent runs required by assignment
-BASE_SEED = 42                     # Fixed base seed for fair comparison
+N_RUNS = 10                      
+BASE_SEED = 42                  
 ITERATIONS = 1500                 
 LAMBDA_1 = 0.10
 LAMBDA_2 = 0.40
@@ -60,7 +57,7 @@ def get_size(folder_name):
 
 def main():
     base_dir = Path(__file__).resolve().parent
-    benchmark_dir = base_dir.parent / "data" # Adjust this path if your data folder is located elsewhere
+    benchmark_dir = base_dir.parent / "data" 
     
     # Fallback to local MoPVRP-instance folder if the global data folder isn't found
     if not benchmark_dir.exists():
@@ -74,7 +71,6 @@ def main():
     with open(csv_file_path, "w", newline="") as csv_file:
         writer = csv.writer(csv_file)
         
-        # WRITE THE HEADER: Every run gets its own row!
         writer.writerow([
             "Model",
             "Folder",
@@ -98,7 +94,7 @@ def main():
             for file_path in dat_files:
                 size = get_size(folder_name)
                 instance_name = file_path.stem
-                instance_label = f"{size}{instance_name}"  # e.g. "10RC101"
+                instance_label = f"{size}{instance_name}"  
 
                 try:
                     instance = read_mopvrp_instance(file_path)
@@ -108,8 +104,6 @@ def main():
                         seed = BASE_SEED + run_index
                         start = time.time()
 
-                        # Note: Check your specific ALNS arguments in the Extended folder.
-                        # You may need to add/remove arguments depending on how you programmed Q-learning/SA.
                         solution = alns(
                             instance,
                             iterations=ITERATIONS,
@@ -118,7 +112,6 @@ def main():
                             lambda_2=LAMBDA_2,
                             initial_solution=greedy_solution,
                             random_seed=seed,
-                            # qlearning params
                             alpha=alpha,
                             gamma=gamma,
                             epsilon_decay_rate=epsilon_decay_rate,
@@ -127,7 +120,6 @@ def main():
                             sa_start_pct=0.05,
                             sa_end_pct=0.0001,
                             sa_accept_prob_start=0.5,
-                            # base params
                             threshold_start=THRESHOLD_START,
                             segment_size=SEGMENT_SIZE,
                             reaction_factor=REACTION_FACTOR,
@@ -142,7 +134,6 @@ def main():
                             cost = "N/A"
                             feasible = False
 
-                        # LOG EVERY SINGLE RUN AS A NEW ROW
                         writer.writerow([
                             MODEL_NAME,
                             folder_name,
@@ -156,7 +147,6 @@ def main():
 
                         print(f"{MODEL_NAME} | {instance_label} | run {run_index + 1}/{N_RUNS} | cost: {cost} | time: {round(runtime, 2)}s", flush=True)
 
-                        # Flush after every run so you don't lose data if it crashes
                         csv_file.flush()
                         os.fsync(csv_file.fileno())
 

@@ -23,9 +23,6 @@ def regret_k_repair(partial_solution, instance, removed_customers, k, apply_nois
             route_costs = []
             
             for route_index, route in enumerate(solution.routes):
-                # find_best_insertion only reads the solution, so we can wrap
-                # the single route in a lightweight Solution instead of deep-
-                # copying the entire current solution for every route.
                 temp_solution = Solution(routes=[route])
                 
                 r_idx, pos, m_id, cost = find_best_insertion(
@@ -53,7 +50,7 @@ def regret_k_repair(partial_solution, instance, removed_customers, k, apply_nois
             best_cost = route_costs[0]["cost"]
             regret_value = 0
             
-            # Calculate regret-k value (Sum of differences up to k-th best route)
+            # Calculate regret-k value 
             for h in range(1, min(k, len(route_costs))):
                 regret_value += (route_costs[h]["cost"] - best_cost)
 
@@ -81,7 +78,6 @@ def regret_k_repair(partial_solution, instance, removed_customers, k, apply_nois
 
     return evaluate_solution(solution, instance, check_all_customers=True)
 
-# Define the 4 wrappers to act as independent operators for the AOS
 def regret_1_repair(solution, instance, removed_customers, apply_noise=False, max_N=0.0):
     return regret_k_repair(solution, instance, removed_customers, k=1, apply_noise=apply_noise, max_N=max_N)
 

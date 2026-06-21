@@ -4,34 +4,27 @@ from scipy.stats import wilcoxon
 import warnings
 from pathlib import Path
 
-# Suppress scipy warnings for zero-variance (which happens when models tie perfectly)
 warnings.filterwarnings('ignore')
 
 def main():
-    # Get the directory where this script is located
     root_dir = Path(__file__).resolve().parent
-    
-    # Define the exact paths to your CSV files based on your folder structure
     base_csv_path = root_dir / "Model" / "base_results.csv"
-    
-    # Note: Adjust "Extended model" below if your folder is named "Extended Extended Model"
     ext_csv_path = root_dir / "Model" / "qlearning_results.csv" 
 
     df_base = pd.read_csv(base_csv_path)
     df_ext = pd.read_csv(ext_csv_path)
 
-    # Ensure models are named clearly in case the CSVs don't have it
     df_base['Model'] = 'Base'
     df_ext['Model'] = 'Hybrid Q-Learning'
 
-    # Combine data to find the global Best Known Solution (BKS)
+    # Combine data to find the global BKS
     df_all = pd.concat([df_base, df_ext])
 
-    # 1. Find BKS (Best Known Solution) per instance
+    # 1. Find BKS per instance
     bks_df = df_all.groupby(['Folder', 'Instance'])['Objective_Cost'].min().reset_index()
     bks_df.rename(columns={'Objective_Cost': 'BKS'}, inplace=True)
 
-    # 2. Calculate Averages (Cost and Time) per instance for both models
+    # 2. Calculate Averages per instance for both models
     avg_base = df_base.groupby(['Folder', 'Instance']).agg(
         Base_Avg_Cost=('Objective_Cost', 'mean'),
         Base_Avg_Time_s=('Time_s', 'mean')
@@ -46,12 +39,12 @@ def main():
     summary_df = pd.merge(bks_df, avg_base, on=['Folder', 'Instance'], how='outer')
     summary_df = pd.merge(summary_df, avg_ext, on=['Folder', 'Instance'], how='outer')
 
-    # 3. Calculate ARPD (%)
+    # 3. Calculate ARPD 
     # Formula: ((Average Cost - BKS) / BKS) * 100
     summary_df['Base_ARPD (%)'] = ((summary_df['Base_Avg_Cost'] - summary_df['BKS']) / summary_df['BKS']) * 100
     summary_df['Ext_ARPD (%)'] = ((summary_df['Ext_Avg_Cost'] - summary_df['BKS']) / summary_df['BKS']) * 100
 
-    # 4. Statistical Analysis: Wilcoxon Signed-Rank Test for COST and TIME
+    # 4. Statistical Analysis: Wilcoxon Signed-Rank Test for cost and time
     cost_p_values = []
     cost_sig = []
     time_p_values = []
@@ -76,7 +69,6 @@ def main():
             p_val_cost = 1.0
         else:
             try:
-                # Assign to result object and extract explicitly to avoid VS Code Pylance errors
                 res_cost = wilcoxon(base_cost, ext_cost)
                 p_val_cost = float(res_cost.pvalue)
             except ValueError:
@@ -98,7 +90,6 @@ def main():
         time_p_values.append(p_val_time)
         time_sig.append("Yes" if p_val_time < 0.05 else "No")
 
-    # Add statistical results to DataFrame
     summary_df['Cost_Wilcoxon_p'] = cost_p_values
     summary_df['Cost_Sig(<0.05)'] = cost_sig
     summary_df['Time_Wilcoxon_p'] = time_p_values
@@ -106,8 +97,6 @@ def main():
 
     summary_df.sort_values(by=['Folder', 'Instance'], inplace=True)
 
-    # 5. Formatting and Exporting
-    # Order columns logically for your report
     final_cols = [
         'Folder', 'Instance', 'BKS', 
         'Base_Avg_Cost', 'Ext_Avg_Cost', 
@@ -118,7 +107,6 @@ def main():
     ]
     summary_df = summary_df[final_cols]
     
-    # Avoid Pylance Dictionary Rounding Error by defining columns as a list
     cols_to_round_2 = [
         'BKS', 'Base_Avg_Cost', 'Ext_Avg_Cost', 
         'Base_ARPD (%)', 'Ext_ARPD (%)', 
@@ -128,13 +116,11 @@ def main():
     summary_df['Cost_Wilcoxon_p'] = summary_df['Cost_Wilcoxon_p'].round(3)
     summary_df['Time_Wilcoxon_p'] = summary_df['Time_Wilcoxon_p'].round(3)
 
-    # Print nicely formatted console output
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', 1000)
     print("\n=== FINAL RESULTS: ARPD AND WILCOXON TESTS ===")
     print(summary_df.to_string(index=False))
 
-    # Export to root directory
     output_path = root_dir / "Final_Report_Table.csv"
     summary_df.to_csv(output_path, index=False)
 

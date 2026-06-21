@@ -4,8 +4,8 @@ import math
 from Classes import Customer, Instance
 
 # ---------------------------------- #
-# Step 2: Create the distance matrix #
-# Use Euclidean distances, as mentioned in the paper #
+# Step 1: Create the distance matrix #
+# Using Euclidean distances          #
 # ---------------------------------- #
 
 def euclidean_distance(c1: Customer, c2: Customer) -> float:
@@ -23,7 +23,7 @@ def build_distance_matrix(nodes: dict[int, Customer]) -> list[list[float]]:
     return matrix
 
 # ---------------------------------- #
-# Step 3: Read the data from the data files
+# Step 2: Read the data from the data files
 # ---------------------------------- #
 
 def read_mopvrp_instance(file_path) -> Instance:
@@ -94,28 +94,3 @@ def read_mopvrp_instance(file_path) -> Instance:
         depot_ids=depot_ids,
         distance_matrix=distance_matrix
     )
-
-
-
-
-# # ---------------------------------- #
-# # Example of reading the first datafile C101.dat #
-# # ---------------------------------- #
-# if __name__ == "__main__":
-#     base_dir = Path(__file__).resolve().parent
-#     file_path = base_dir / "C101.dat"
-
-#     instance = read_mopvrp_instance(file_path)
-
-#     print("Instance name:", instance.name)
-#     print("Number of customer tasks:", instance.n_tasks)
-#     print("Machines per vehicle:", instance.machines_per_vehicle)
-#     print("Number of vehicles:", instance.n_vehicles)
-#     print("Vehicle capacity:", instance.vehicle_capacity)
-#     print("Max duration:", instance.max_duration)
-#     print("Production coefficient:", instance.production_coefficient)
-#     print("Depot ids:", instance.depot_ids)
-
-#     print("\nCustomers:")
-#     for customer_id, customer in instance.customers.items():
-#         print(customer)
