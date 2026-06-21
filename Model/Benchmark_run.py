@@ -34,7 +34,7 @@ LAMBDA_2 = 0.40
 # Q-learning params (only used when MODE == "qlearning")
 alpha = 0.5
 gamma = 0.7
-epsilon_decay_rate = 0.99
+epsilon_decay_rate = 0.997
 eta_reward = 0.6
 C = 1.0
 

@@ -2,7 +2,7 @@ import random
 from collections import defaultdict
 
 class QAgent:
-    def __init__(self, operators, alpha=0.5, gamma=0.7, epsilon_start=1.0, epsilon_end=0.05, epsilon_decay_rate=0.99, eta_reward=0.6, C=1.0):
+    def __init__(self, operators, alpha=0.5, gamma=0.7, epsilon_start=1.0, epsilon_end=0.05, epsilon_decay_rate=0.997, eta_reward=0.6, C=1.0):
         """
         Initialize the Q-Learning Agent.
         :param operators: Dictionary of {"operator_name": function_call}
