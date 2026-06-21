@@ -131,10 +131,6 @@ def _build_operators():
     noise_options = {"With_Noise": True, "No_Noise": False}
     return destroy_operators, repair_operators, noise_options
 
-
-# ---------------------------------------------------------------------------
-# Public entry point
-# ---------------------------------------------------------------------------
 def alns(
     instance,
     iterations,
